@@ -1,22 +1,17 @@
 {
-  "short_name": "Opto360",
-  "name": "Equipo Móvil 360 - Optometría & Mantenimiento",
+  "short_name": "Óptica 360",
+  "name": "Óptica 360 | Exámenes Visuales",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135698.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "./index.html",
   "background_color": "#0f172a",
   "theme_color": "#0284c7",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "scope": "./"
+  "orientation": "portrait"
 }
