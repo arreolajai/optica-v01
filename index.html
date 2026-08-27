@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans p-4 relative">
+<body class="bg-slate-100 text-slate-800 font-sans p-4 relative" onload="inicializarApp()">
     
     <!-- PANTALLA 1: LOGIN -->
     <div id="pantalla-login" class="fixed inset-0 bg-slate-900 z-[70] flex items-center justify-center p-4">
@@ -59,49 +59,75 @@
         </div>
 
         <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-600" id="reporte-pdf">
-            <h1 class="text-2xl font-bold text-center text-sky-700 mb-6">
+            <h1 class="text-2xl font-bold text-center text-sky-700 mb-6 border-b pb-4">
                 <i class="fa-solid fa-glasses"></i> Óptica 360
             </h1>
             
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Nombre del Paciente</label>
-                    <input type="text" id="paciente" class="w-full border p-2 rounded bg-slate-50" placeholder="Ej. Juan Pérez">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 border p-4 rounded bg-slate-50">
+                <!-- Fecha y Paciente -->
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-sky-700 mb-2">OD</label>
-                        <input type="text" placeholder="Esf" class="w-full border p-2 rounded mb-2">
-                        <input type="text" placeholder="Cil" class="w-full border p-2 rounded mb-2">
-                        <input type="text" placeholder="Eje" class="w-full border p-2 rounded">
+                        <label class="block text-sm font-semibold mb-1">Fecha</label>
+                        <input type="date" id="fecha-consulta" class="w-full border p-2 rounded bg-slate-50 text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-sky-700 mb-2">OI</label>
-                        <input type="text" placeholder="Esf" class="w-full border p-2 rounded mb-2">
-                        <input type="text" placeholder="Cil" class="w-full border p-2 rounded mb-2">
-                        <input type="text" placeholder="Eje" class="w-full border p-2 rounded">
+                        <label class="block text-sm font-semibold mb-1">Paciente</label>
+                        <input type="text" id="paciente" class="w-full border p-2 rounded bg-slate-50 text-sm" placeholder="Nombre completo">
+                    </div>
+                </div>
+
+                <!-- Graduación -->
+                <div class="grid grid-cols-2 gap-4 border p-4 rounded bg-slate-50">
+                    <div>
+                        <label class="block text-sm font-bold text-sky-700 mb-2">OD (Derecho)</label>
+                        <input type="text" placeholder="Esf" class="w-full border p-2 rounded mb-2 text-sm">
+                        <input type="text" placeholder="Cil" class="w-full border p-2 rounded mb-2 text-sm">
+                        <input type="text" placeholder="Eje" class="w-full border p-2 rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-sky-700 mb-2">OI (Izquierdo)</label>
+                        <input type="text" placeholder="Esf" class="w-full border p-2 rounded mb-2 text-sm">
+                        <input type="text" placeholder="Cil" class="w-full border p-2 rounded mb-2 text-sm">
+                        <input type="text" placeholder="Eje" class="w-full border p-2 rounded text-sm">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 border p-4 rounded bg-slate-50">
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1">ADD</label>
-                        <input type="text" class="w-full border p-2 rounded">
+                        <input type="text" class="w-full border p-2 rounded text-sm">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1">DNP</label>
-                        <input type="text" class="w-full border p-2 rounded">
+                        <input type="text" class="w-full border p-2 rounded text-sm">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold mb-1">Diagnóstico / Especificaciones</label>
-                    <textarea class="w-full border p-2 rounded bg-slate-50" rows="3" placeholder="Tipo de mica..."></textarea>
+                    <label class="block text-sm font-semibold mb-1">Diagnóstico / Armazón</label>
+                    <textarea class="w-full border p-2 rounded bg-slate-50 text-sm" rows="2" placeholder="Tipo de mica, modelo, notas..."></textarea>
+                </div>
+
+                <!-- Módulo Financiero -->
+                <h3 class="text-sm font-bold text-slate-700 border-t pt-3 mt-2"><i class="fa-solid fa-money-bill-wave"></i> Detalles de Pago</h3>
+                <div class="grid grid-cols-3 gap-2 border p-3 rounded bg-slate-50">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Total ($)</label>
+                        <input type="number" id="monto-total" placeholder="0" class="w-full border p-2 rounded text-sm" oninput="calcularSaldo()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Abono ($)</label>
+                        <input type="number" id="monto-abono" placeholder="0" class="w-full border p-2 rounded text-sm" oninput="calcularSaldo()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Saldo ($)</label>
+                        <input type="number" id="monto-saldo" placeholder="0" class="w-full border p-2 rounded bg-slate-200 text-red-600 font-bold text-sm" readonly>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Botones de Acción -->
         <div class="max-w-md mx-auto mt-6 space-y-3 mb-8">
             <button onclick="generarYEnviarPDF()" class="w-full bg-sky-600 text-white p-3 rounded shadow-md hover:bg-sky-700 font-bold transition">
                 <i class="fa-solid fa-file-pdf"></i> Generar Reporte PDF
@@ -120,7 +146,23 @@
     <script>
         const USUARIO_VALIDO = "admin";
         const PASSWORD_VALIDO = "1234";
-        const SECRET_PIN = "OPTO360"; // PIN SECRETO (Debe coincidir con el del generador)
+        const SECRET_PIN = "OPTO360"; 
+
+        // Inicializar fecha actual al cargar
+        function inicializarApp() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha-consulta').value = hoy;
+        }
+
+        // Lógica de cálculo de saldos
+        function calcularSaldo() {
+            const total = parseFloat(document.getElementById('monto-total').value) || 0;
+            const abono = parseFloat(document.getElementById('monto-abono').value) || 0;
+            let saldo = total - abono;
+            // Evitar saldos negativos si el abono es mayor al total
+            if (saldo < 0) saldo = 0; 
+            document.getElementById('monto-saldo').value = saldo;
+        }
 
         function iniciarSesion() {
             const user = document.getElementById('login-user').value;
@@ -143,7 +185,6 @@
             let expira = localStorage.getItem('optica_licencia_expira');
             const ahora = new Date().getTime();
 
-            // Lógica de los 7 días de prueba automáticos la primera vez
             if (!expira) {
                 const sieteDias = 7 * 24 * 60 * 60 * 1000;
                 expira = ahora + sieteDias;
@@ -183,7 +224,6 @@
             }
         }
 
-        // --- MÓDULO DE PDF Y ENVÍOS ---
         function generarYEnviarPDF() {
             const elemento = document.getElementById('reporte-pdf');
             const nombre = document.getElementById('paciente').value || 'Paciente';
@@ -194,8 +234,18 @@
             };
             html2pdf().set(opciones).from(elemento).save();
         }
-        function enviarWhatsApp() { window.open(`https://api.whatsapp.com/send?phone=521234567890&text=Te adjuntamos tu reporte de examen visual.`, '_blank'); }
-        function enviarCorreo() { window.location.href = `mailto:paciente@ejemplo.com?subject=Tu Receta Optométrica`; }
+
+        function enviarWhatsApp() { 
+            const paciente = document.getElementById('paciente').value || 'Paciente';
+            const saldo = document.getElementById('monto-saldo').value || 0;
+            const texto = encodeURIComponent(`Hola ${paciente}, te adjuntamos tu reporte de examen visual. Su saldo actual es de $${saldo}.`);
+            window.open(`https://api.whatsapp.com/send?phone=521234567890&text=${texto}`, '_blank'); 
+        }
+
+        function enviarCorreo() { 
+            const paciente = document.getElementById('paciente').value || 'Paciente';
+            window.location.href = `mailto:paciente@ejemplo.com?subject=Tu Receta Optométrica&body=Hola ${paciente}, adjuntamos tu reporte visual.`; 
+        }
     </script>
 </body>
 </html>
