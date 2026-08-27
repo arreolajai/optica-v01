@@ -40,7 +40,7 @@
         <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
             <i class="fa-solid fa-lock text-5xl text-sky-600 mb-4"></i>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Licencia Expirada</h2>
-            <p class="text-slate-600 text-sm mb-6">Tu período de prueba o acceso ha finalizado. Solicita una nueva clave de activación a tu proveedor.</p>
+            <p class="text-slate-600 text-sm mb-6">Tu período de prueba o acceso ha finalizado. Solicita una nueva clave a tu proveedor.</p>
             
             <input type="text" id="input-clave" placeholder="Ej. 30-OPTO360-XYZ" class="w-full border-2 border-slate-300 p-3 rounded-lg mb-4 text-center font-mono uppercase tracking-widest focus:border-sky-500 outline-none">
             
@@ -48,6 +48,27 @@
                 Activar Licencia
             </button>
             <p id="error-licencia" class="text-red-500 text-sm mt-3 hidden font-semibold"></p>
+        </div>
+    </div>
+
+    <!-- MODAL DE ENVÍOS (NUEVO FLUJO) -->
+    <div id="modal-envios" class="hidden fixed inset-0 bg-slate-900/80 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full text-center">
+            <i class="fa-solid fa-circle-check text-5xl text-green-500 mb-4"></i>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">¡PDF Guardado!</h3>
+            <p class="text-slate-600 text-sm mb-6">El archivo se descargó en tu dispositivo. Selecciona un medio para avisarle al paciente (recuerda adjuntar manualmente el PDF en el chat):</p>
+            
+            <div class="space-y-3">
+                <button onclick="enviarWhatsApp()" class="w-full bg-green-500 text-white p-3 rounded shadow hover:bg-green-600 font-bold flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-xl"></i> Abrir WhatsApp
+                </button>
+                <button onclick="enviarCorreo()" class="w-full bg-slate-700 text-white p-3 rounded shadow hover:bg-slate-800 font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-envelope text-xl"></i> Abrir Correo
+                </button>
+                <button onclick="cerrarModalEnvios()" class="w-full text-slate-500 p-2 mt-2 hover:text-slate-700 font-semibold text-sm">
+                    Regresar a la app
+                </button>
+            </div>
         </div>
     </div>
 
@@ -64,7 +85,6 @@
             </h1>
             
             <div class="space-y-4">
-                <!-- Fecha y Paciente -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold mb-1">Fecha</label>
@@ -76,7 +96,6 @@
                     </div>
                 </div>
 
-                <!-- Graduación -->
                 <div class="grid grid-cols-2 gap-4 border p-4 rounded bg-slate-50">
                     <div>
                         <label class="block text-sm font-bold text-sky-700 mb-2">OD (Derecho)</label>
@@ -127,19 +146,11 @@
             </div>
         </div>
 
-        <!-- Botones de Acción -->
+        <!-- Botón Único de Acción -->
         <div class="max-w-md mx-auto mt-6 space-y-3 mb-8">
-            <button onclick="generarYEnviarPDF()" class="w-full bg-sky-600 text-white p-3 rounded shadow-md hover:bg-sky-700 font-bold transition">
-                <i class="fa-solid fa-file-pdf"></i> Generar Reporte PDF
+            <button onclick="procesarReporte()" class="w-full bg-sky-600 text-white p-4 rounded-xl shadow-lg hover:bg-sky-700 font-bold transition flex items-center justify-center gap-3 text-lg">
+                <i class="fa-solid fa-file-pdf"></i> Generar Reporte y Enviar
             </button>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="enviarWhatsApp()" class="bg-green-500 text-white p-3 rounded shadow-md hover:bg-green-600 font-bold transition flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                </button>
-                <button onclick="enviarCorreo()" class="bg-slate-700 text-white p-3 rounded shadow-md hover:bg-slate-800 font-bold transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-envelope"></i> Correo
-                </button>
-            </div>
         </div>
     </div>
 
@@ -148,18 +159,15 @@
         const PASSWORD_VALIDO = "1234";
         const SECRET_PIN = "OPTO360"; 
 
-        // Inicializar fecha actual al cargar
         function inicializarApp() {
             const hoy = new Date().toISOString().split('T')[0];
             document.getElementById('fecha-consulta').value = hoy;
         }
 
-        // Lógica de cálculo de saldos
         function calcularSaldo() {
             const total = parseFloat(document.getElementById('monto-total').value) || 0;
             const abono = parseFloat(document.getElementById('monto-abono').value) || 0;
             let saldo = total - abono;
-            // Evitar saldos negativos si el abono es mayor al total
             if (saldo < 0) saldo = 0; 
             document.getElementById('monto-saldo').value = saldo;
         }
@@ -184,14 +192,11 @@
         function verificarLicencia() {
             let expira = localStorage.getItem('optica_licencia_expira');
             const ahora = new Date().getTime();
-
             if (!expira) {
                 const sieteDias = 7 * 24 * 60 * 60 * 1000;
                 expira = ahora + sieteDias;
                 localStorage.setItem('optica_licencia_expira', expira);
-                alert("¡Bienvenido! Se ha activado tu versión de prueba por 7 días.");
             }
-
             if (ahora > parseInt(expira)) {
                 document.getElementById('app-principal').classList.add('hidden');
                 document.getElementById('pantalla-licencia').classList.remove('hidden');
@@ -224,7 +229,8 @@
             }
         }
 
-        function generarYEnviarPDF() {
+        // NUEVO FLUJO: Generar PDF y LUEGO mostrar opciones de envío
+        function procesarReporte() {
             const elemento = document.getElementById('reporte-pdf');
             const nombre = document.getElementById('paciente').value || 'Paciente';
             const opciones = {
@@ -232,7 +238,15 @@
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opciones).from(elemento).save();
+            
+            // Crea el PDF, lo descarga y luego abre el modal de WhatsApp/Correo
+            html2pdf().set(opciones).from(elemento).save().then(() => {
+                document.getElementById('modal-envios').classList.remove('hidden');
+            });
+        }
+
+        function cerrarModalEnvios() {
+            document.getElementById('modal-envios').classList.add('hidden');
         }
 
         function enviarWhatsApp() { 
@@ -240,11 +254,13 @@
             const saldo = document.getElementById('monto-saldo').value || 0;
             const texto = encodeURIComponent(`Hola ${paciente}, te adjuntamos tu reporte de examen visual. Su saldo actual es de $${saldo}.`);
             window.open(`https://api.whatsapp.com/send?phone=521234567890&text=${texto}`, '_blank'); 
+            cerrarModalEnvios();
         }
 
         function enviarCorreo() { 
             const paciente = document.getElementById('paciente').value || 'Paciente';
             window.location.href = `mailto:paciente@ejemplo.com?subject=Tu Receta Optométrica&body=Hola ${paciente}, adjuntamos tu reporte visual.`; 
+            cerrarModalEnvios();
         }
     </script>
 </body>
