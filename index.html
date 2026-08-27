@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans p-4 relative">
     
-    <!-- PANTALLA 1: LOGIN INICIAL -->
+    <!-- PANTALLA 1: LOGIN -->
     <div id="pantalla-login" class="fixed inset-0 bg-slate-900 z-[70] flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-t-4 border-sky-600">
             <i class="fa-solid fa-user-doctor text-5xl text-sky-600 mb-4"></i>
@@ -38,10 +38,9 @@
     <!-- PANTALLA 2: BLOQUEO POR LICENCIA -->
     <div id="pantalla-licencia" class="hidden fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
-            <!-- DOBLE CLIC EN EL CANDADO PARA ABRIR EL GENERADOR EN CASO DE EMERGENCIA -->
-            <i ondblclick="abrirAdmin()" class="fa-solid fa-lock text-5xl text-sky-600 mb-4 cursor-pointer" title="Doble clic para opciones admin"></i>
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Licencia Requerida</h2>
-            <p class="text-slate-600 text-sm mb-6">Tu período de acceso ha expirado o es tu primer ingreso. Ingresa tu clave.</p>
+            <i class="fa-solid fa-lock text-5xl text-sky-600 mb-4"></i>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Licencia Expirada</h2>
+            <p class="text-slate-600 text-sm mb-6">Tu período de prueba o acceso ha finalizado. Solicita una nueva clave de activación a tu proveedor.</p>
             
             <input type="text" id="input-clave" placeholder="Ej. 30-OPTO360-XYZ" class="w-full border-2 border-slate-300 p-3 rounded-lg mb-4 text-center font-mono uppercase tracking-widest focus:border-sky-500 outline-none">
             
@@ -49,32 +48,6 @@
                 Activar Licencia
             </button>
             <p id="error-licencia" class="text-red-500 text-sm mt-3 hidden font-semibold"></p>
-        </div>
-    </div>
-
-    <!-- GENERADOR DE CLAVES OCULTO (ADMIN) -->
-    <div id="panel-admin" class="hidden fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-sky-700"><i class="fa-solid fa-key"></i> Generador de Claves</h3>
-                <button onclick="cerrarAdmin()" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <p class="text-sm text-slate-600 mb-4">Selecciona el período para generar un token de activación.</p>
-            
-            <select id="tipo-licencia" class="w-full border p-2 rounded mb-4 bg-slate-50 font-semibold">
-                <option value="7">Semanal (7 días)</option>
-                <option value="30">Mensual (30 días)</option>
-                <option value="180">Semestral (180 días)</option>
-                <option value="365">Anual (365 días)</option>
-            </select>
-            
-            <button onclick="generarClave()" class="w-full bg-slate-800 text-white font-bold p-2 rounded hover:bg-slate-900 transition mb-4">
-                Generar Token
-            </button>
-
-            <div class="bg-slate-100 p-3 rounded text-center border">
-                <span id="clave-generada" class="font-mono font-bold text-lg text-sky-700 tracking-widest">---</span>
-            </div>
         </div>
     </div>
 
@@ -86,7 +59,7 @@
         </div>
 
         <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-600" id="reporte-pdf">
-            <h1 ondblclick="abrirAdmin()" class="text-2xl font-bold text-center text-sky-700 mb-6 cursor-pointer select-none" title="Doble clic para opciones admin">
+            <h1 class="text-2xl font-bold text-center text-sky-700 mb-6">
                 <i class="fa-solid fa-glasses"></i> Óptica 360
             </h1>
             
@@ -98,40 +71,40 @@
 
                 <div class="grid grid-cols-2 gap-4 border p-4 rounded bg-slate-50">
                     <div>
-                        <label class="block text-sm font-bold text-sky-700 mb-2">Ojo Derecho (OD)</label>
-                        <input type="text" placeholder="Esfera" class="w-full border p-2 rounded mb-2">
-                        <input type="text" placeholder="Cilindro" class="w-full border p-2 rounded mb-2">
+                        <label class="block text-sm font-bold text-sky-700 mb-2">OD</label>
+                        <input type="text" placeholder="Esf" class="w-full border p-2 rounded mb-2">
+                        <input type="text" placeholder="Cil" class="w-full border p-2 rounded mb-2">
                         <input type="text" placeholder="Eje" class="w-full border p-2 rounded">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-sky-700 mb-2">Ojo Izquierdo (OI)</label>
-                        <input type="text" placeholder="Esfera" class="w-full border p-2 rounded mb-2">
-                        <input type="text" placeholder="Cilindro" class="w-full border p-2 rounded mb-2">
+                        <label class="block text-sm font-bold text-sky-700 mb-2">OI</label>
+                        <input type="text" placeholder="Esf" class="w-full border p-2 rounded mb-2">
+                        <input type="text" placeholder="Cil" class="w-full border p-2 rounded mb-2">
                         <input type="text" placeholder="Eje" class="w-full border p-2 rounded">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 border p-4 rounded bg-slate-50">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-600 mb-1">Adición (ADD)</label>
+                        <label class="block text-sm font-semibold text-slate-600 mb-1">ADD</label>
                         <input type="text" class="w-full border p-2 rounded">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-600 mb-1">Distancia Pupilar (DNP)</label>
+                        <label class="block text-sm font-semibold text-slate-600 mb-1">DNP</label>
                         <input type="text" class="w-full border p-2 rounded">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold mb-1">Diagnóstico / Especificaciones</label>
-                    <textarea class="w-full border p-2 rounded bg-slate-50" rows="3" placeholder="Tipo de mica, modelo de armazón..."></textarea>
+                    <textarea class="w-full border p-2 rounded bg-slate-50" rows="3" placeholder="Tipo de mica..."></textarea>
                 </div>
             </div>
         </div>
 
         <div class="max-w-md mx-auto mt-6 space-y-3 mb-8">
             <button onclick="generarYEnviarPDF()" class="w-full bg-sky-600 text-white p-3 rounded shadow-md hover:bg-sky-700 font-bold transition">
-                <i class="fa-solid fa-file-pdf"></i> 1. Generar Reporte PDF
+                <i class="fa-solid fa-file-pdf"></i> Generar Reporte PDF
             </button>
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="enviarWhatsApp()" class="bg-green-500 text-white p-3 rounded shadow-md hover:bg-green-600 font-bold transition flex items-center justify-center gap-2">
@@ -145,43 +118,45 @@
     </div>
 
     <script>
-        // --- 1. MÓDULO DE ACCESO (LOGIN) ---
         const USUARIO_VALIDO = "admin";
         const PASSWORD_VALIDO = "1234";
+        const SECRET_PIN = "OPTO360"; // PIN SECRETO (Debe coincidir con el del generador)
 
         function iniciarSesion() {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            const errorMsg = document.getElementById('error-login');
-
             if (user === USUARIO_VALIDO && pass === PASSWORD_VALIDO) {
                 document.getElementById('pantalla-login').classList.add('hidden');
-                verificarLicencia(); // Una vez logueado, verificamos si hay licencia activa
+                verificarLicencia(); 
             } else {
-                errorMsg.classList.remove('hidden');
+                document.getElementById('error-login').classList.remove('hidden');
             }
         }
 
         function cerrarSesion() {
             document.getElementById('app-principal').classList.add('hidden');
             document.getElementById('pantalla-login').classList.remove('hidden');
-            document.getElementById('login-pass').value = ''; // Limpiar contraseña por seguridad
+            document.getElementById('login-pass').value = ''; 
         }
 
-        // --- 2. MÓDULO DE LICENCIAMIENTO ---
-        const SECRET_PIN = "OPTO360"; 
-
         function verificarLicencia() {
-            const expira = localStorage.getItem('optica_licencia_expira');
+            let expira = localStorage.getItem('optica_licencia_expira');
             const ahora = new Date().getTime();
 
-            if (!expira || ahora > parseInt(expira)) {
+            // Lógica de los 7 días de prueba automáticos la primera vez
+            if (!expira) {
+                const sieteDias = 7 * 24 * 60 * 60 * 1000;
+                expira = ahora + sieteDias;
+                localStorage.setItem('optica_licencia_expira', expira);
+                alert("¡Bienvenido! Se ha activado tu versión de prueba por 7 días.");
+            }
+
+            if (ahora > parseInt(expira)) {
                 document.getElementById('app-principal').classList.add('hidden');
                 document.getElementById('pantalla-licencia').classList.remove('hidden');
             } else {
                 document.getElementById('app-principal').classList.remove('hidden');
                 document.getElementById('pantalla-licencia').classList.add('hidden');
-                
                 const diasRestantes = Math.ceil((parseInt(expira) - ahora) / (1000 * 60 * 60 * 24));
                 document.getElementById('estado-licencia').innerText = `Licencia: ${diasRestantes} días`;
             }
@@ -200,6 +175,7 @@
                 localStorage.setItem('optica_licencia_expira', nuevaExpiracion);
                 errorMsg.classList.add('hidden');
                 alert(`✅ Aplicación activada con éxito por ${dias} días.`);
+                document.getElementById('input-clave').value = '';
                 verificarLicencia();
             } else {
                 errorMsg.innerText = "Clave inválida o expirada.";
@@ -207,23 +183,7 @@
             }
         }
 
-        // --- 3. MÓDULO SUPERADMIN (GENERADOR DE CLAVES) ---
-        function abrirAdmin() {
-            document.getElementById('panel-admin').classList.remove('hidden');
-        }
-
-        function cerrarAdmin() {
-            document.getElementById('panel-admin').classList.add('hidden');
-        }
-
-        function generarClave() {
-            const dias = document.getElementById('tipo-licencia').value;
-            const aleatorio = Math.random().toString(36).substring(2, 6).toUpperCase();
-            const nuevaClave = `${dias}-${SECRET_PIN}-${aleatorio}`;
-            document.getElementById('clave-generada').innerText = nuevaClave;
-        }
-
-        // --- 4. MÓDULO DE PDF Y ENVÍOS ---
+        // --- MÓDULO DE PDF Y ENVÍOS ---
         function generarYEnviarPDF() {
             const elemento = document.getElementById('reporte-pdf');
             const nombre = document.getElementById('paciente').value || 'Paciente';
@@ -232,20 +192,10 @@
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opciones).from(elemento).save().then(() => {
-                alert('✅ Receta PDF generada.');
-            });
+            html2pdf().set(opciones).from(elemento).save();
         }
-        function enviarWhatsApp() {
-            const numero = "521234567890";
-            const paciente = document.getElementById('paciente').value || 'Paciente';
-            window.open(`https://api.whatsapp.com/send?phone=${numero}&text=Hola ${paciente}, te adjuntamos tu reporte de examen visual.`, '_blank');
-        }
-        function enviarCorreo() {
-            const correo = "paciente@ejemplo.com";
-            const paciente = document.getElementById('paciente').value || 'Paciente';
-            window.location.href = `mailto:${correo}?subject=Tu Receta Optométrica&body=Hola ${paciente}, adjuntamos tu reporte visual.`;
-        }
+        function enviarWhatsApp() { window.open(`https://api.whatsapp.com/send?phone=521234567890&text=Te adjuntamos tu reporte de examen visual.`, '_blank'); }
+        function enviarCorreo() { window.location.href = `mailto:paciente@ejemplo.com?subject=Tu Receta Optométrica`; }
     </script>
 </body>
 </html>
