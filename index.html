@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -9,32 +9,57 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans p-4 relative" onload="verificarLicencia()">
+<body class="bg-slate-100 text-slate-800 font-sans p-4 relative">
     
-    <!-- PANTALLA DE BLOQUEO POR LICENCIA -->
+    <!-- PANTALLA 1: LOGIN INICIAL -->
+    <div id="pantalla-login" class="fixed inset-0 bg-slate-900 z-[70] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-t-4 border-sky-600">
+            <i class="fa-solid fa-user-doctor text-5xl text-sky-600 mb-4"></i>
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Acceso Óptica 360</h2>
+            
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Usuario</label>
+                    <input type="text" id="login-user" value="admin" class="w-full border p-3 rounded-lg bg-slate-50 focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Contraseña</label>
+                    <input type="password" id="login-pass" value="1234" class="w-full border p-3 rounded-lg bg-slate-50 focus:outline-none focus:border-sky-500">
+                </div>
+            </div>
+            
+            <button onclick="iniciarSesion()" class="w-full bg-sky-600 text-white font-bold p-3 rounded-lg hover:bg-sky-700 transition mt-6">
+                Ingresar al Sistema
+            </button>
+            <p id="error-login" class="text-red-500 text-sm mt-3 hidden font-semibold">Credenciales incorrectas.</p>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: BLOQUEO POR LICENCIA -->
     <div id="pantalla-licencia" class="hidden fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
-            <i class="fa-solid fa-lock text-5xl text-sky-600 mb-4"></i>
+            <!-- DOBLE CLIC EN EL CANDADO PARA ABRIR EL GENERADOR EN CASO DE EMERGENCIA -->
+            <i ondblclick="abrirAdmin()" class="fa-solid fa-lock text-5xl text-sky-600 mb-4 cursor-pointer" title="Doble clic para opciones admin"></i>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Licencia Requerida</h2>
-            <p class="text-slate-600 text-sm mb-6">Tu período de acceso ha expirado o no se ha activado. Ingresa tu clave para continuar.</p>
+            <p class="text-slate-600 text-sm mb-6">Tu período de acceso ha expirado o es tu primer ingreso. Ingresa tu clave.</p>
             
-            <input type="text" id="input-clave" placeholder="Ej. XXXX-XXXX-XXXX" class="w-full border-2 border-slate-300 p-3 rounded-lg mb-4 text-center font-mono uppercase tracking-widest focus:border-sky-500 outline-none">
+            <input type="text" id="input-clave" placeholder="Ej. 30-OPTO360-XYZ" class="w-full border-2 border-slate-300 p-3 rounded-lg mb-4 text-center font-mono uppercase tracking-widest focus:border-sky-500 outline-none">
             
-            <button onclick="activarLicencia()" class="w-full bg-sky-600 text-white font-bold p-3 rounded-lg hover:bg-sky-700 transition">
-                Activar Aplicación
+            <button onclick="activarLicencia()" class="w-full bg-slate-800 text-white font-bold p-3 rounded-lg hover:bg-slate-900 transition">
+                Activar Licencia
             </button>
             <p id="error-licencia" class="text-red-500 text-sm mt-3 hidden font-semibold"></p>
         </div>
     </div>
 
     <!-- GENERADOR DE CLAVES OCULTO (ADMIN) -->
-    <div id="panel-admin" class="hidden fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4">
+    <div id="panel-admin" class="hidden fixed inset-0 bg-black/90 z-[80] flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold text-sky-700"><i class="fa-solid fa-key"></i> Generador de Claves</h3>
                 <button onclick="cerrarAdmin()" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <p class="text-sm text-slate-600 mb-4">Selecciona el período para generar un token de activación válido.</p>
+            <p class="text-sm text-slate-600 mb-4">Selecciona el período para generar un token de activación.</p>
             
             <select id="tipo-licencia" class="w-full border p-2 rounded mb-4 bg-slate-50 font-semibold">
                 <option value="7">Semanal (7 días)</option>
@@ -53,16 +78,16 @@
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
+    <!-- PANTALLA 3: APLICACIÓN PRINCIPAL -->
     <div id="app-principal" class="hidden">
-        <div class="text-right mb-2">
+        <div class="flex justify-between items-center mb-4 max-w-md mx-auto">
+            <button onclick="cerrarSesion()" class="text-sm font-bold text-slate-500 hover:text-red-500"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
             <span id="estado-licencia" class="text-xs font-bold bg-sky-100 text-sky-700 px-3 py-1 rounded-full border border-sky-300"></span>
         </div>
 
         <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-600" id="reporte-pdf">
-            <!-- DOBLE CLIC AQUÍ PARA ABRIR EL PANEL DE ADMIN -->
-            <h1 ondblclick="abrirAdmin()" class="text-2xl font-bold text-center text-sky-700 mb-6 cursor-pointer select-none">
-                <i class="fa-solid fa-glasses"></i> Óptica 360 | Reporte Visual
+            <h1 ondblclick="abrirAdmin()" class="text-2xl font-bold text-center text-sky-700 mb-6 cursor-pointer select-none" title="Doble clic para opciones admin">
+                <i class="fa-solid fa-glasses"></i> Óptica 360
             </h1>
             
             <div class="space-y-4">
@@ -98,18 +123,16 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold mb-1">Diagnóstico / Especificaciones de Lentes</label>
-                    <textarea class="w-full border p-2 rounded bg-slate-50" rows="3" placeholder="Tipo de mica (Antirreflejante, Bifocal), modelo de armazón, observaciones..."></textarea>
+                    <label class="block text-sm font-semibold mb-1">Diagnóstico / Especificaciones</label>
+                    <textarea class="w-full border p-2 rounded bg-slate-50" rows="3" placeholder="Tipo de mica, modelo de armazón..."></textarea>
                 </div>
             </div>
         </div>
 
-        <!-- Botones de Acción -->
-        <div class="max-w-md mx-auto mt-6 space-y-3">
+        <div class="max-w-md mx-auto mt-6 space-y-3 mb-8">
             <button onclick="generarYEnviarPDF()" class="w-full bg-sky-600 text-white p-3 rounded shadow-md hover:bg-sky-700 font-bold transition">
                 <i class="fa-solid fa-file-pdf"></i> 1. Generar Reporte PDF
             </button>
-            
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="enviarWhatsApp()" class="bg-green-500 text-white p-3 rounded shadow-md hover:bg-green-600 font-bold transition flex items-center justify-center gap-2">
                     <i class="fa-brands fa-whatsapp"></i> WhatsApp
@@ -122,32 +145,51 @@
     </div>
 
     <script>
-        // --- MÓDULO DE LICENCIAMIENTO ---
-        const SECRET_PIN = "OPTO360"; // Base para la validación de claves
+        // --- 1. MÓDULO DE ACCESO (LOGIN) ---
+        const USUARIO_VALIDO = "admin";
+        const PASSWORD_VALIDO = "1234";
+
+        function iniciarSesion() {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            const errorMsg = document.getElementById('error-login');
+
+            if (user === USUARIO_VALIDO && pass === PASSWORD_VALIDO) {
+                document.getElementById('pantalla-login').classList.add('hidden');
+                verificarLicencia(); // Una vez logueado, verificamos si hay licencia activa
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function cerrarSesion() {
+            document.getElementById('app-principal').classList.add('hidden');
+            document.getElementById('pantalla-login').classList.remove('hidden');
+            document.getElementById('login-pass').value = ''; // Limpiar contraseña por seguridad
+        }
+
+        // --- 2. MÓDULO DE LICENCIAMIENTO ---
+        const SECRET_PIN = "OPTO360"; 
 
         function verificarLicencia() {
             const expira = localStorage.getItem('optica_licencia_expira');
             const ahora = new Date().getTime();
 
             if (!expira || ahora > parseInt(expira)) {
-                // Bloquear app
                 document.getElementById('app-principal').classList.add('hidden');
                 document.getElementById('pantalla-licencia').classList.remove('hidden');
             } else {
-                // Permitir acceso y calcular días restantes
                 document.getElementById('app-principal').classList.remove('hidden');
                 document.getElementById('pantalla-licencia').classList.add('hidden');
                 
                 const diasRestantes = Math.ceil((parseInt(expira) - ahora) / (1000 * 60 * 60 * 24));
-                document.getElementById('estado-licencia').innerText = `Licencia activa: ${diasRestantes} días restantes`;
+                document.getElementById('estado-licencia').innerText = `Licencia: ${diasRestantes} días`;
             }
         }
 
         function activarLicencia() {
             const claveInput = document.getElementById('input-clave').value.trim().toUpperCase();
             const errorMsg = document.getElementById('error-licencia');
-            
-            // Lógica de validación: La clave debe tener el formato DIAS-SECRETO-ALEATORIO (Ej. 30-OPTO360-XYZ)
             const partes = claveInput.split('-');
             
             if (partes.length === 3 && partes[1] === SECRET_PIN) {
@@ -165,7 +207,7 @@
             }
         }
 
-        // --- MÓDULO SUPERADMIN (GENERADOR DE CLAVES) ---
+        // --- 3. MÓDULO SUPERADMIN (GENERADOR DE CLAVES) ---
         function abrirAdmin() {
             document.getElementById('panel-admin').classList.remove('hidden');
         }
@@ -177,12 +219,11 @@
         function generarClave() {
             const dias = document.getElementById('tipo-licencia').value;
             const aleatorio = Math.random().toString(36).substring(2, 6).toUpperCase();
-            // Genera la clave estructurada
             const nuevaClave = `${dias}-${SECRET_PIN}-${aleatorio}`;
             document.getElementById('clave-generada').innerText = nuevaClave;
         }
 
-        // --- MÓDULO DE PDF Y ENVÍOS (Misma lógica anterior) ---
+        // --- 4. MÓDULO DE PDF Y ENVÍOS ---
         function generarYEnviarPDF() {
             const elemento = document.getElementById('reporte-pdf');
             const nombre = document.getElementById('paciente').value || 'Paciente';
